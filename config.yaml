@@ -1,0 +1,27 @@
+serial:
+  sn: 334499
+  password: 445512
+  server_ip: localhost
+  timeout: 0.5
+  baud: 115200
+  port: COM8
+
+cameras:
+  - camera:
+      address: 0
+      name: right_left_1.jpg
+      compression: 34
+      resolution: 7
+      nightfill: 100
+  - camera:
+      address: 1
+      name: right_left_2.jpg
+      compression: 34
+      resolution: 6
+      nightfill: 100
+  - camera:
+      address: 2
+      name: right_right_1.jpg
+      compression: 34
+      resolution: 7
+      nightfill: 100
