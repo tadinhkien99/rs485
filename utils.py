@@ -25,13 +25,19 @@ getbufflencommand = [COMMANDSEND, SERIALNUM, CMD_GETBUFFLEN, 0x01, FBUF_CURRENTF
 readphotocommand = [COMMANDSEND, SERIALNUM, CMD_READBUFF, 0x0c, FBUF_CURRENTFRAME, 0x0a]
 
 # Set up logging
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+def setup_logger():
+    logging.basicConfig(
+        filename='app.log',
+        filemode='w',
+        # include %(asctime)s in your format
+        format='%(asctime)s - %(message)s',
+        level=logging.INFO,
+        # specify datefmt for %(asctime)s
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    logger = logging.getLogger(__name__)
 
-# Print to console
-console = logging.StreamHandler()
-logger.addHandler(console)
-
+    return logger
 
 def checkreply(r, b):
     if r[0] == COMMANDREPLY and r[1] == SERIALNUM and r[2] == b and r[3] == 0x00:
@@ -39,11 +45,12 @@ def checkreply(r, b):
     return False
 
 
-def getversion(s):
+def getversion(s, logger):
     cmd = bytes(getversioncommand)
     s.write(cmd)
     reply = s.read(18)
-    logger.info(f"Version: {reply}")
+    hex_array = [f"{b:02x}" for b in reply]
+    logger.info(f"Get version: {hex_array}")
     r = list(reply)
     if checkreply(r, CMD_GETVERSION):
         print("Camera Found:", r)
@@ -51,22 +58,24 @@ def getversion(s):
     return False
 
 
-def takephoto(s):
+def takephoto(s, logger):
     cmd = bytes(takephotocommand)
     s.write(cmd)
     reply = s.read(12)
-    logger.info(f"Take photo: {reply}")
+    hex_array = [f"{b:02x}" for b in reply]
+    logger.info(f"Take photo: {hex_array}")
     r = list(reply)
     if checkreply(r, CMD_TAKEPHOTO) and r[3] == chr(0x0):
         return True
     return False
 
 
-def getbufferlength(s):
+def getbufferlength(s, logger):
     cmd = bytes(getbufflencommand)
     s.write(cmd)
     reply = s.read(9)
-    logger.info(f"Buffer length: {reply}")
+    hex_array = [f"{b:02x}" for b in reply]
+    logger.info(f"Get buffer length: {hex_array}")
     r = list(reply)
     if r[4] == 0x4:
         l = r[6]
@@ -78,7 +87,7 @@ def getbufferlength(s):
     return 0
 
 
-def readbuffer(s, total_bytes):
+def readbuffer(s, total_bytes, logger):
     addr = 0  # the initial offset into the frame buffer
     photo = bytearray()  # Using bytearray for efficient data appending
     inc = 8192  # Bytes to read each time (must be a multiple of 4)
@@ -96,6 +105,8 @@ def readbuffer(s, total_bytes):
         cmd = bytes(command)
         s.write(cmd)
         reply = s.read(5 + chunk + 5)
+        hex_array = [f"{b:02x}" for b in reply]
+        logger.info(f"Read buffer: {hex_array}")
         if len(reply) != 5 + chunk + 5:
             print(f"Read {len(reply)} bytes, retrying.")
             continue
