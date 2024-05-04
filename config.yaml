@@ -8,7 +8,7 @@ serial:
 
 cameras:
   - camera:
-      address: 0
+      address: 1
       name: right_left_1.jpg
       compression: 34
       resolution: 7

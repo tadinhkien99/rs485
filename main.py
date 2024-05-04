@@ -1,42 +1,27 @@
-import serial
-import yaml
-
-from utils import getversion, takephoto, getbufferlength, readbuffer, setup_logger
-
+from serial_operation import SerialOperation
+from config import Config
 
 
 if __name__ == '__main__':
+    config = Config("config.yaml")
+    camera_configs, port, baud, timeout = config.config()
+    logger = config.setup_logger()
+    for camera_config in camera_configs:
+        camera_address = camera_config.get('camera').get('address')
 
-    # Setup logger
-    logger = setup_logger()
-
-    # config.yaml path
-    config_path = "config.yaml"
-    with open(config_path, "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.Loader)
-        cameraConfigs = cfg.get('cameras')
-        PORT = cfg['serial']['port']
-        BAUD = cfg['serial']['baud']
-        TIMEOUT = cfg['serial']['timeout']
-
-    for cameraConfig in cameraConfigs:
-        # Set the camera address
-        camera_address = cameraConfig.get('camera').get('address')
-        SERIALNUM = camera_address
-        logger.info(f"Camera address: {camera_address}")
-        # Creating a session
-        s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
-        if not getversion(s, logger):
-            print("Camera", camera_address, "not found")
+        worker = SerialOperation(camera_address, port, baud, timeout, logger)
+        version_status = worker.get_version()
+        if not version_status:
             continue
-        if takephoto(s, logger):
+
+        if worker.take_photo():
             print("Snap!")
-        bytes_buffer = getbufferlength(s, logger)
-        photo_data = readbuffer(s, bytes_buffer, logger)
+            buffer_length, hex_reply = worker.get_buffer_length()
+            photo_data = worker.read_buffer_photo(buffer_length, hex_reply)
+            with open(camera_config.get('camera').get('name'), 'wb') as f:
+                f.write(photo_data)
+            print("Photo has been taken from Camera", camera_address)
+        else:
+            print("Failed to take photo")
+            continue
 
-        # Save picture with names from config
-        with open(cameraConfig.get('camera').get('name'), 'wb') as f:
-            f.write(photo_data)
-
-        print("Photo has been taken from Camera", camera_address)
-        print(f"Photo has been save to {cameraConfig.get('camera').get('name')}")
