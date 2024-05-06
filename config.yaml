@@ -1,27 +1,25 @@
 serial:
-  sn: 334499
-  password: 445512
-  server_ip: localhost
   timeout: 0.5
   baud: 115200
-  port: COM8
+  port: COM7
+
+azure:
+  connection_string: "DefaultEndpointsProtocol=https;AccountName=testrs485;AccountKey=FnxX7b/tuM96mu6JABEuIRq9UO6Qx5qxXuRUYlyKZF5sp8EBw6D4T5cRXDsjsKWEtfJvYYerUQac+AStTGWNCw==;EndpointSuffix=core.windows.net"
+  container_name: "test"
+
 
 cameras:
   - camera:
       address: 1
-      name: right_left_1.jpg
+      name: right_left_1.jpeg
       compression: 34
       resolution: 7
       nightfill: 100
   - camera:
-      address: 1
+      address: 2
       name: right_left_2.jpg
       compression: 34
       resolution: 6
       nightfill: 100
-  - camera:
-      address: 2
-      name: right_right_1.jpg
-      compression: 34
-      resolution: 7
-      nightfill: 100
+
+

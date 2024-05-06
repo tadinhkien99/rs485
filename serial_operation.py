@@ -3,7 +3,9 @@
 # @Filename:    serial_operation.py
 # @Author:      kien.tadinh
 # @Time:        5/4/2024 10:56 AM
+
 import serial
+from azure.storage.blob import ContainerClient
 
 
 class SerialOperation:
@@ -24,6 +26,9 @@ class SerialOperation:
         self.command_begin_photo = [0xFF, 0xD8]
         self.command_end_photo = [0xFF, 0xD9]
 
+    def disconnect(self):
+        self.serial_worker.close()
+
     def concatenate_buffer_length(self, bytes_buffer):
         begin_bytes_buffer = bytes(
             [self.command_send, self.serial_num, self.command_read, 0x0C, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00])
@@ -31,8 +36,7 @@ class SerialOperation:
         return begin_bytes_buffer + bytes_buffer + end_bytes_buffer
 
     def check_reply(self, reply, check_command):
-        if reply[0] == self.command_reply and reply[1] == self.serial_num and reply[2] == check_command and reply[
-            3] == 0x00:
+        if reply[0] == self.command_reply and reply[1] == self.serial_num and reply[2] == check_command and reply[3] == 0x00:
             return True
         return False
 
@@ -87,10 +91,10 @@ class SerialOperation:
             if not start_found:
                 start_index = data.find(start_marker)
                 if start_index != -1:
-                    data = data[start_index:]
+                    data = data[start_index:]  # Remove the start marker
                     start_found = True
                 else:
-                    continue
+                    continue  # Start marker not found, skip this part
 
             if start_found:
                 end_index = data.find(end_marker)
@@ -99,6 +103,51 @@ class SerialOperation:
 
                 else:
                     photo_buffer.extend(data[:end_index + 2])
-                    break
+                    break  # Found the end marker, stop reading
 
         return bytes(photo_buffer)
+
+class AzureOperation:
+    def __init__(self, connection_string, container_name, logger=None):
+        self.logger = logger
+        self.connection_string = connection_string
+        self.container_name = container_name
+        self.container_client = ContainerClient.from_connection_string(self.connection_string, container_name)
+
+    def upload_blob(self, file_path, blob_name):
+        try:
+            blob_client = self.container_client.get_blob_client(blob=blob_name)
+            with open(file_path, "rb") as data:
+                blob_client.upload_blob(data)
+            print("Upload blob successfully")
+        except Exception as e:
+            print("Upload blob failed")
+            print(e)
+
+    def delete_blob(self, blob_name):
+        try:
+            blob_client = self.container_client.get_blob_client(blob=blob_name)
+            blob_client.delete_blob()
+            print("Delete blob successfully")
+        except Exception as e:
+            print("Delete blob failed")
+            print(e)
+
+    def list_blobs(self):
+        try:
+            return [blob.name for blob in self.container_client.list_blobs()]
+        except Exception as e:
+            print("List blobs failed")
+            return []
+
+    def download_blob(self, blob_name, download_file_path):
+        try:
+            blob_client = self.container_client.get_blob_client(blob=blob_name)
+            with open(download_file_path, "wb") as download_file:
+                download_file.write(blob_client.download_blob().readall())
+            print("Download blob successfully")
+        except Exception as e:
+            print("Download blob failed")
+            print(e)
+
+

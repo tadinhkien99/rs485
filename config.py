@@ -17,9 +17,14 @@ class Config:
             self.PORT = cfg['serial']['port']
             self.BAUD = cfg['serial']['baud']
             self.TIMEOUT = cfg['serial']['timeout']
+            self.AZURE_STORAGE_CONNECTION_STRING = cfg['azure']['connection_string']
+            self.AZURE_STORAGE_CONTAINER_NAME = cfg['azure']['container_name']
 
-    def config(self):
+    def camera_config(self):
         return self.CAMERAS, self.PORT, self.BAUD, self.TIMEOUT
+
+    def azure_config(self):
+        return self.AZURE_STORAGE_CONNECTION_STRING, self.AZURE_STORAGE_CONTAINER_NAME
 
     # Setup logger
     def setup_logger(self):
@@ -32,3 +37,8 @@ class Config:
         )
         logger = logging.getLogger(__name__)
         return logger
+
+
+
+
+
