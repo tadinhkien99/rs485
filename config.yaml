@@ -7,17 +7,16 @@ azure:
   connection_string: "DefaultEndpointsProtocol=https;AccountName=testrs485;AccountKey=FnxX7b/tuM96mu6JABEuIRq9UO6Qx5qxXuRUYlyKZF5sp8EBw6D4T5cRXDsjsKWEtfJvYYerUQac+AStTGWNCw==;EndpointSuffix=core.windows.net"
   container_name: "test"
 
-
 cameras:
   - camera:
       address: 1
-      name: right_left_1.jpeg
+      name: right_left_1
       compression: 34
       resolution: 7
       nightfill: 100
   - camera:
       address: 2
-      name: right_left_2.jpg
+      name: right_left_2
       compression: 34
       resolution: 6
       nightfill: 100
