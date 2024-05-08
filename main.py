@@ -16,7 +16,8 @@ if __name__ == '__main__':
     cargo_serial, base_path = config.cargo_config()
 
     current_date = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    datapath = create_directory(os.path.join(base_path, cargo_serial, current_date))
+    datapath = os.path.join(base_path, cargo_serial, current_date)
+    create_directory(datapath)
 
     for camera_config in camera_configs:
         address = camera_config.get('camera').get('address')

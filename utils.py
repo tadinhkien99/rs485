@@ -13,3 +13,5 @@ def delete_old_pictures(folder, days=7):
         filepath = os.path.join(folder, filename)
         if os.stat(filepath).st_mtime < now - days * 86400:
             os.remove(filepath)
+
+
