@@ -6,7 +6,7 @@ serial:
 
 cargo:
   serial_number: S23417
-  path: "C:\\Python"
+  path: "data"
 
 azure:
   connection_string: "DefaultEndpointsProtocol=https;AccountName=rs485;AccountKey=CoJqB9VFTKilKRKunDiLU/BNT/pEgw0fcCY7+GmSvnzur2iJz2A1+J4OZzxC2V7C++8cL7MaaXl8+AStNbDBoQ==;EndpointSuffix=core.windows.net"
