@@ -1,15 +1,20 @@
 serial:
   timeout: 0.5
   baud: 115200
-  port: COM7
+  port: COM3
+
+
+cargo:
+  serial_number: S23417
+  path: "C:\\Python"
 
 azure:
-  connection_string: "DefaultEndpointsProtocol=https;AccountName=testrs485;AccountKey=FnxX7b/tuM96mu6JABEuIRq9UO6Qx5qxXuRUYlyKZF5sp8EBw6D4T5cRXDsjsKWEtfJvYYerUQac+AStTGWNCw==;EndpointSuffix=core.windows.net"
+  connection_string: "DefaultEndpointsProtocol=https;AccountName=rs485;AccountKey=CoJqB9VFTKilKRKunDiLU/BNT/pEgw0fcCY7+GmSvnzur2iJz2A1+J4OZzxC2V7C++8cL7MaaXl8+AStNbDBoQ==;EndpointSuffix=core.windows.net"
   container_name: "test"
 
 cameras:
   - camera:
-      address: 1
+      address: 3
       name: right_left_1
       compression: 34
       resolution: 7

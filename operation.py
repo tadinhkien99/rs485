@@ -107,6 +107,7 @@ class SerialOperation:
 
         return bytes(photo_buffer)
 
+
 class AzureOperation:
     def __init__(self, connection_string, container_name, logger=None):
         self.logger = logger
@@ -149,5 +150,3 @@ class AzureOperation:
         except Exception as e:
             print("Download blob failed")
             print(e)
-
-

@@ -19,9 +19,14 @@ class Config:
             self.TIMEOUT = cfg['serial']['timeout']
             self.AZURE_STORAGE_CONNECTION_STRING = cfg['azure']['connection_string']
             self.AZURE_STORAGE_CONTAINER_NAME = cfg['azure']['container_name']
+            self.SN = cfg['cargo']['serial_number']
+            self.PATH = cfg['cargo']['path']
 
     def camera_config(self):
         return self.CAMERAS, self.PORT, self.BAUD, self.TIMEOUT
+
+    def cargo_config(self):
+        return self.SN, self.PATH
 
     def azure_config(self):
         return self.AZURE_STORAGE_CONNECTION_STRING, self.AZURE_STORAGE_CONTAINER_NAME
@@ -37,8 +42,3 @@ class Config:
         )
         logger = logging.getLogger(__name__)
         return logger
-
-
-
-
-
