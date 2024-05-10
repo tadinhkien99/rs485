@@ -1,7 +1,7 @@
 serial:
   timeout: 0.5
   baud: 115200
-  port: COM3
+  port: COM5
 
 
 cargo:
@@ -9,9 +9,8 @@ cargo:
   path: "data"
 
 azure:
-  connection_string: ""
+  connection_string:
   container_name: "test"
-
 cameras:
   - camera:
       address: 3

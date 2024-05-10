@@ -32,9 +32,9 @@ class Config:
         return self.AZURE_STORAGE_CONNECTION_STRING, self.AZURE_STORAGE_CONTAINER_NAME
 
     # Setup logger
-    def setup_logger(self):
+    def setup_logger(self, filename):
         logging.basicConfig(
-            filename='app.log',
+            filename=filename,
             filemode='w',
             format='%(asctime)s - %(message)s',
             level=logging.INFO,

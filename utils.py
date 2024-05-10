@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 
 
@@ -13,5 +14,8 @@ def delete_old_pictures(folder, days=7):
         filepath = os.path.join(folder, filename)
         if os.stat(filepath).st_mtime < now - days * 86400:
             os.remove(filepath)
+
+def zipping_folder(folder):
+    shutil.make_archive(folder, 'zip', folder)
 
 

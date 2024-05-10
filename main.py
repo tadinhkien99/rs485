@@ -1,16 +1,18 @@
 import os
+
+import cv2
 from datetime import datetime
 
 from config import Config
 from operation import SerialOperation, AzureOperation
-from utils import create_directory
+from utils import create_directory, zipping_folder
 
 if __name__ == '__main__':
     config = Config("config.yaml")
     camera_configs, port, baud, timeout = config.camera_config()
     azure_config = config.azure_config()
     azure_worker = AzureOperation(azure_config[0], azure_config[1])
-    logger = config.setup_logger()
+
     internet_status = False
 
     cargo_serial, base_path = config.cargo_config()
@@ -20,17 +22,21 @@ if __name__ == '__main__':
     create_directory(datapath)
 
     for camera_config in camera_configs:
+        current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        create_directory(os.path.join(datapath, current_time))
+        logger = config.setup_logger(os.path.join(datapath, current_time, "log.log"))
+
         address = camera_config.get('camera').get('address')
 
         try:
             worker = SerialOperation(address, port, baud, timeout, logger)
         except:
-            print("cannot Open Com")
+            logger.info("cannot Open Com")
             exit(1)
         try:
             version_status = worker.get_version()
         except:
-            print("cannot connect to camera", address)
+            logger.info("cannot connect to camera", address)
             worker.disconnect()
             continue
         if not version_status:
@@ -38,33 +44,32 @@ if __name__ == '__main__':
             continue
 
         if worker.take_photo():
-            print("take picture from camera ", address)
+            logger.info("take picture from camera ", address)
             buffer_length, hex_reply = worker.get_buffer_length()
             photo_data = worker.read_buffer_photo(buffer_length, hex_reply)
 
             image_name = f"{camera_config.get('camera').get('name')}.jpg"
-            image_path = os.path.join(datapath, image_name)
+            image_path = os.path.join(datapath, current_time, image_name)
             with open(image_path, 'wb') as f:
                 f.write(photo_data)
-            print("Photo has been taken from Camera", address)
-
-            azure_worker.upload_blob(image_path, image_name)
+            logger.info("Photo has been taken from Camera", address)
         else:
-            print("Failed to take photo for camera", address)
+            logger.info("Failed to take photo for camera", address)
             continue
-
+        zipping_folder(os.path.join(datapath, current_time))
+        azure_worker.upload_blob(os.path.join(datapath, current_time + ".zip"), os.path.join(current_time + ".zip"))
         worker.disconnect()
-
+   
     # i=0
     # while not internet_status:
     #     time.sleep(1)
     #     i += 1
     #     logger.info("waiting for internet connection {}seconds".format(i))
-    #     internetstatus = connect()
+    #     internet_status = connect()
     #
     #     if i > 200:
     #         logger.info("internet connection timeout")
     #         break
     #
-    # if internetstatus:
+    # if internet_status:
     #     logger.info(" connection to internet successful ")
